@@ -1,0 +1,37 @@
+# https://www.rubenvezzoli.online/bulk-download-data-google-trends-r/
+# (2019-08-04)
+
+# Install and load the readr and gtrendsR packages
+
+#install.packages('readr')
+library(readr)
+#install.packages('gtrendsR')
+library(gtrendsR)
+
+# Load your keywords list (.csv file)
+setwd('C:/Users/szymc/OneDrive/Dokumenty') 
+kwlist <- readLines("words.csv")
+
+  
+# The for loop downloads the data for every single keyword in your list
+resultslist <- list() 
+
+for (keywords in kwlist){
+  # Set the geographic region, time span, Google product,... 
+  # for more information read the official documentation https://cran.r-project.org/web/packages/gtrendsR/gtrendsR.pdf
+  country <- c('PL')
+  time <- ("2019-01-01 2019-07-31")
+  channel <- 'web'
+  trends <- gtrends(keywords, 
+                    gprop = channel,
+                    geo = country, 
+                    time = time)
+  resultslist[[keywords]] <- trends$interest_over_time
+}
+
+# Merge all the data into a dataframe
+output <- as.data.frame(do.call("rbind", resultslist)) 
+
+# Download the dataframe "output" as a .csv file
+write.csv2(output,"download.csv")
+
